@@ -32,7 +32,7 @@ export default function Home() {
   }
   async function newTrip() {
     const { data, error } = await sb.from('trips')
-      .insert({ agency: trips.length ? '' : 'Mi agencia', days: [{ title: 'Día 1', items: [] }] })
+      .insert({ agency: trips.length ? '' : 'Mi agencia', days: [{ date: '', title: '', items: [] }] })
       .select('id').single();
     if (error) return alert('No se pudo crear el viaje.');
     router.push('/trip/' + data.id);

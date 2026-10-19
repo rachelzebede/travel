@@ -4,6 +4,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb, TIPOS } from '../../../lib/supabase';
 
+function sortDays(n) {
+  n.days.sort((a, b) => (a.date || '9999-99-99').localeCompare(b.date || '9999-99-99'));
+}
+function nextDate(s) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 function sortDay(n, di) {
   n.days[di].items.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
 }
@@ -76,8 +85,11 @@ export default function Trip({ params }) {
       {t.days.map((d, di) => (
         <div className="panel" key={di}>
           <div className="row" style={{ alignItems: 'end' }}>
-            <div style={{ flex: 1 }}><label>Título del día</label>
-              <input value={d.title} onChange={e => change(n => { n.days[di].title = e.target.value; })} /></div>
+            <div style={{ width: 170 }}><label>Fecha</label>
+              <input type="date" value={d.date || ''} onChange={e => change(n => { n.days[di].date = e.target.value; })}
+                onBlur={() => d.date && change(n => sortDays(n))} /></div>
+            <div style={{ flex: 1, minWidth: 180 }}><label>Título del día</label>
+              <input placeholder="Ej: Llegada a Lisboa" value={d.title} onChange={e => change(n => { n.days[di].title = e.target.value; })} /></div>
             <button className="btn del" onClick={() => confirm('¿Quitar este día?') && change(n => n.days.splice(di, 1))}>Quitar día</button>
           </div>
           {d.items.map((it, ii) => (
@@ -112,7 +124,8 @@ export default function Trip({ params }) {
           <button className="btn" style={{ marginTop: 8 }} onClick={() => change(n => sortDay(n, di))}>Ordenar por hora</button>
         </div>
       ))}
-      <button className="btn main" onClick={() => change(n => n.days.push({ title: 'Día ' + (n.days.length + 1), items: [] }))}>Agregar día</button>{' '}
+      <button className="btn main" onClick={() => change(n => n.days.push({ date: nextDate((n.days[n.days.length - 1] || {}).date), title: '', items: [] }))}>Agregar día</button>{' '}
+      <button className="btn" onClick={() => change(n => sortDays(n))}>Ordenar días por fecha</button>{' '}
       <button className="btn del" onClick={delTrip}>Eliminar viaje</button>
     </main>
   );

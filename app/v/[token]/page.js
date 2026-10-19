@@ -2,6 +2,11 @@
 import { useEffect, useState } from 'react';
 import { sb, TIPOS } from '../../../lib/supabase';
 
+function fmt(s) {
+  const d = new Date(s + 'T00:00:00');
+  return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
 export default function Cliente({ params }) {
   const [t, setT] = useState(null);
   const [fail, setFail] = useState(false);
@@ -15,7 +20,9 @@ export default function Cliente({ params }) {
       <div className="hero"><h1>{t.title}</h1><p className="note">{t.dates}</p>
         <p className="by">Preparado para {t.client} por {t.agency}</p></div>
       {t.days.map((d, i) => (
-        <section className="day" key={i}><h2>{d.title}</h2>
+        <section className="day" key={i}>
+          <div className="dk">Día {i + 1}{d.date ? ' · ' + fmt(d.date) : ''}</div>
+          {d.title && !/^D[ií]a \d+$/i.test(d.title.trim()) && <h2>{d.title}</h2>}
           {d.items.map((it, j) => (
             <div className="card" key={j}>
               <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{it.time ? ' · ' + it.time : ''}</div>
