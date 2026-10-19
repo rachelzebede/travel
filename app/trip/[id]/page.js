@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb, TIPOS } from '../../../lib/supabase';
 
+function sortDay(n, di) {
+  n.days[di].items.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+}
+
 export default function Trip({ params }) {
   const id = params.id;
   const router = useRouter();
@@ -42,6 +46,9 @@ export default function Trip({ params }) {
     await sb.storage.from('confirmaciones').remove([f.path]);
     change(n => n.days[di].items[ii].files.splice(fi, 1));
   }
+  function move(di, ii, dir) {
+    change(n => { const a = n.days[di].items; const j = ii + dir; if (j < 0 || j >= a.length) return; [a[ii], a[j]] = [a[j], a[ii]]; });
+  }
   async function delTrip() {
     if (!confirm('¿Eliminar este viaje?')) return;
     await sb.from('trips').delete().eq('id', id);
@@ -76,13 +83,21 @@ export default function Trip({ params }) {
           {d.items.map((it, ii) => (
             <div className="item" key={ii}>
               <select value={it.type} onChange={e => change(n => { n.days[di].items[ii].type = e.target.value; })}>
-                {Object.keys(TIPOS).map(k => <option key={k} value={k}>{TIPOS[k]}</option>)}
+                {Object.keys(TIPOS).map(k => <option key={k} value={k}>{TIPOS[k][0]} {TIPOS[k][1]}</option>)}
               </select>
-              <input placeholder="Hora" value={it.time} onChange={e => change(n => { n.days[di].items[ii].time = e.target.value; })} />
+              <input type="time" value={it.time} onChange={e => change(n => { n.days[di].items[ii].time = e.target.value; })}
+                onBlur={() => it.time && change(n => sortDay(n, di))} />
               <input className="t" placeholder="Título" value={it.title} onChange={e => change(n => { n.days[di].items[ii].title = e.target.value; })} />
-              <button className="btn del" onClick={() => change(n => n.days[di].items.splice(ii, 1))}>✕</button>
+              <div className="acts">
+                <button className="btn" disabled={ii === 0} onClick={() => move(di, ii, -1)} aria-label="Subir">↑</button>
+                <button className="btn" disabled={ii === d.items.length - 1} onClick={() => move(di, ii, 1)} aria-label="Bajar">↓</button>
+                <button className="btn del" onClick={() => change(n => n.days[di].items.splice(ii, 1))} aria-label="Quitar">✕</button>
+              </div>
               <textarea className="full" rows={2} placeholder="Detalles, confirmaciones, notas" value={it.detail}
                 onChange={e => change(n => { n.days[di].items[ii].detail = e.target.value; })} />
+              <input className="full" placeholder="Link del boleto o reserva (opcional)" value={it.url || ''}
+                onChange={e => change(n => { n.days[di].items[ii].url = e.target.value; })}
+                onBlur={e => { const v = e.target.value.trim(); if (v && !/^https?:\/\//i.test(v)) change(n => { n.days[di].items[ii].url = 'https://' + v; }); }} />
               <div className="full">
                 {(it.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delFile(di, ii, fi)}>✕</button></span>))}
                 <div style={{ marginTop: 8 }}><label className="btn" style={{ display: 'inline-block', color: 'var(--ink)' }}>
@@ -93,7 +108,8 @@ export default function Trip({ params }) {
             </div>
           ))}
           <button className="btn" style={{ marginTop: 8 }}
-            onClick={() => change(n => n.days[di].items.push({ type: 'actividad', time: '', title: '', detail: '', files: [] }))}>Agregar item</button>
+            onClick={() => change(n => n.days[di].items.push({ type: 'actividad', time: '', title: '', detail: '', url: '', files: [] }))}>Agregar item</button>{' '}
+          <button className="btn" style={{ marginTop: 8 }} onClick={() => change(n => sortDay(n, di))}>Ordenar por hora</button>
         </div>
       ))}
       <button className="btn main" onClick={() => change(n => n.days.push({ title: 'Día ' + (n.days.length + 1), items: [] }))}>Agregar día</button>{' '}

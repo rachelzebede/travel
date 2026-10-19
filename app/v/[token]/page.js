@@ -18,8 +18,9 @@ export default function Cliente({ params }) {
         <section className="day" key={i}><h2>{d.title}</h2>
           {d.items.map((it, j) => (
             <div className="card" key={j}>
-              <div className="k">{TIPOS[it.type] || 'Nota'}{it.time ? ' · ' + it.time : ''}</div>
+              <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{it.time ? ' · ' + it.time : ''}</div>
               <h3>{it.title}</h3>{it.detail && <p>{it.detail}</p>}
+              {/^https?:\/\//i.test(it.url || '') && <a className="pdf" href={it.url} target="_blank" rel="noopener noreferrer">🔗 Abrir reserva</a>}
               {(it.files || []).map((f, k) => (f.ct || '').startsWith('image/')
                 ? <a key={k} href={f.url} target="_blank" rel="noopener"><img className="thumb" src={f.url} alt={f.name} /></a>
                 : <a key={k} className="pdf" href={f.url} target="_blank" rel="noopener">Ver {f.name}</a>)}
