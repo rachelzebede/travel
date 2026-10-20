@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { sb, TIPOS } from '../../../lib/supabase';
+import { sb, TIPOS, MOVE } from '../../../lib/supabase';
 
 function sortDays(n) {
   n.days.sort((a, b) => (a.date || '9999-99-99').localeCompare(b.date || '9999-99-99'));
@@ -97,13 +97,23 @@ export default function Trip({ params }) {
               <select value={it.type} onChange={e => change(n => { n.days[di].items[ii].type = e.target.value; })}>
                 {Object.keys(TIPOS).map(k => <option key={k} value={k}>{TIPOS[k][0]} {TIPOS[k][1]}</option>)}
               </select>
-              <input type="time" value={it.time} onChange={e => change(n => { n.days[di].items[ii].time = e.target.value; })}
-                onBlur={() => it.time && change(n => sortDay(n, di))} />
+              
               <input className="t" placeholder="Título" value={it.title} onChange={e => change(n => { n.days[di].items[ii].title = e.target.value; })} />
               <div className="acts">
                 <button className="btn" disabled={ii === 0} onClick={() => move(di, ii, -1)} aria-label="Subir">↑</button>
                 <button className="btn" disabled={ii === d.items.length - 1} onClick={() => move(di, ii, 1)} aria-label="Bajar">↓</button>
                 <button className="btn del" onClick={() => change(n => n.days[di].items.splice(ii, 1))} aria-label="Quitar">✕</button>
+              </div>
+              {it.type === 'vuelo' && (
+                <input className="full" placeholder="Número de vuelo (ej: AV 123)" value={it.flight || ''}
+                  onChange={e => change(n => { n.days[di].items[ii].flight = e.target.value; })} />
+              )}
+              <div className="full times">
+                <div><label>{MOVE.includes(it.type) ? 'Salida' : 'Empieza'}</label>
+                  <input type="time" value={it.time} onChange={e => change(n => { n.days[di].items[ii].time = e.target.value; })}
+                    onBlur={() => it.time && change(n => sortDay(n, di))} /></div>
+                <div><label>{MOVE.includes(it.type) ? 'Llegada' : 'Termina (opcional)'}</label>
+                  <input type="time" value={it.end || ''} onChange={e => change(n => { n.days[di].items[ii].end = e.target.value; })} /></div>
               </div>
               <textarea className="full" rows={2} placeholder="Detalles, confirmaciones, notas" value={it.detail}
                 onChange={e => change(n => { n.days[di].items[ii].detail = e.target.value; })} />

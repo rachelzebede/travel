@@ -1,7 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { sb, TIPOS } from '../../../lib/supabase';
+import { sb, TIPOS, MOVE } from '../../../lib/supabase';
 
+function hrs(it) {
+  if (!it.time && !it.end) return '';
+  if (!it.end) return it.time;
+  if (!it.time) return it.end;
+  return it.time + (MOVE.includes(it.type) ? ' → ' : ' – ') + it.end;
+}
 function fmt(s) {
   const d = new Date(s + 'T00:00:00');
   return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -25,8 +31,8 @@ export default function Cliente({ params }) {
           {d.title && !/^D[ií]a \d+$/i.test(d.title.trim()) && <h2>{d.title}</h2>}
           {d.items.map((it, j) => (
             <div className="card" key={j}>
-              <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{it.time ? ' · ' + it.time : ''}</div>
-              <h3>{it.title}</h3>{it.detail && <p>{it.detail}</p>}
+              <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{hrs(it) ? ' · ' + hrs(it) : ''}</div>
+              <h3>{it.title}</h3>{it.type === 'vuelo' && it.flight && <p>Vuelo {it.flight}</p>}{it.detail && <p>{it.detail}</p>}
               {/^https?:\/\//i.test(it.url || '') && <a className="pdf" href={it.url} target="_blank" rel="noopener noreferrer">🔗 Abrir reserva</a>}
               {(it.files || []).map((f, k) => (f.ct || '').startsWith('image/')
                 ? <a key={k} href={f.url} target="_blank" rel="noopener"><img className="thumb" src={f.url} alt={f.name} /></a>
