@@ -8,6 +8,11 @@ function hrs(it) {
   if (!it.time) return it.end;
   return it.time + (MOVE.includes(it.type) ? ' → ' : ' – ') + it.end;
 }
+function addDays(s, k) {
+  const d = new Date(s + 'T00:00:00');
+  d.setDate(d.getDate() + k);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 function fmt(s) {
   const d = new Date(s + 'T00:00:00');
   return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -25,10 +30,30 @@ export default function Cliente({ params }) {
     <main>
       <div className="hero"><h1>{t.title}</h1><p className="note">{t.dates}</p>
         <p className="by">Preparado para {t.client} por {t.agency}</p></div>
+      {(t.hotels || []).some(h => h.name) && (
+        <section className="day">
+          <div className="dk">Alojamiento</div>
+          {t.hotels.filter(h => h.name).map((h, i) => (
+            <div className="card" key={i}>
+              <div className="k">🏨 Hotel</div>
+              <h3>{h.name}</h3>
+              {h.date && <p>Entrada: {fmt(h.date)} · {h.nights} noche{h.nights > 1 ? 's' : ''} · Salida: {fmt(addDays(h.date, h.nights))}</p>}
+              {/^https?:\/\//i.test(h.url || '') && <a className="pdf" href={h.url} target="_blank" rel="noopener noreferrer">🔗 Abrir reserva</a>}
+              {(h.phone || '').replace(/\D/g, '').length >= 5 && <a className="pdf" href={'tel:' + h.phone.replace(/[^\d+]/g, '')}>📞 {h.phone}</a>}
+            </div>
+          ))}
+        </section>
+      )}
       {t.days.map((d, i) => (
         <section className="day" key={i}>
           <div className="dk">Día {i + 1}{d.date ? ' · ' + fmt(d.date) : ''}</div>
           {d.title && !/^D[ií]a \d+$/i.test(d.title.trim()) && <h2>{d.title}</h2>}
+          {(t.hotels || []).filter(h => h.name && h.date && d.date).map((h, k) => {
+            const out = addDays(h.date, h.nights);
+            if (d.date >= h.date && d.date < out) return <p className="note" style={{ margin: '0 0 8px' }} key={k}>🏨 Noche en {h.name}</p>;
+            if (d.date === out) return <p className="note" style={{ margin: '0 0 8px' }} key={k}>🧳 Check-out de {h.name}</p>;
+            return null;
+          })}
           {d.items.map((it, j) => (
             <div className="card" key={j}>
               <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{hrs(it) ? ' · ' + hrs(it) : ''}</div>

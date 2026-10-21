@@ -4,6 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb, TIPOS, MOVE } from '../../../lib/supabase';
 
+function addDays(s, k) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  d.setDate(d.getDate() + k);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function fmtDate(s) {
+  const d = new Date(s + 'T00:00:00');
+  return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
+}
 function sortDays(n) {
   n.days.sort((a, b) => (a.date || '9999-99-99').localeCompare(b.date || '9999-99-99'));
 }
@@ -37,7 +47,7 @@ export default function Trip({ params }) {
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       const { error } = await sb.from('trips')
-        .update({ agency: n.agency, title: n.title, client: n.client, dates: n.dates, days: n.days }).eq('id', id);
+        .update({ agency: n.agency, title: n.title, client: n.client, dates: n.dates, days: n.days, hotels: n.hotels || [] }).eq('id', id);
       setMsg(error ? 'Error al guardar' : 'Guardado');
     }, 700);
   }
@@ -65,6 +75,7 @@ export default function Trip({ params }) {
   }
   if (!t) return <main>Cargando…</main>;
   const link = `${location.origin}/v/${t.share_token}`;
+  const hset = (hi, k, v) => change(n => { n.hotels[hi][k] = v; });
   const field = (k, label) => (<div><label>{label}</label><input value={t[k] || ''} onChange={e => change(n => { n[k] = e.target.value; })} /></div>);
 
   return (
@@ -81,6 +92,25 @@ export default function Trip({ params }) {
       </div>
       <div className="panel" style={{ display: 'grid', gap: 12 }}>
         {field('agency', 'Tu agencia')}{field('title', 'Nombre del viaje')}{field('client', 'Cliente')}{field('dates', 'Fechas')}
+      </div>
+      <div className="panel">
+        <div className="row"><h3>🏨 Hoteles</h3>
+          <button className="btn" onClick={() => change(n => { n.hotels = [...(n.hotels || []), { name: '', date: '', nights: 1, url: '', phone: '' }]; })}>Agregar hotel</button></div>
+        {!(t.hotels || []).length && <p className="note">Agrega el hotel con su fecha de entrada y las noches: aparece solo en cada noche del viaje.</p>}
+        {(t.hotels || []).map((h, hi) => (
+          <div className="item" key={hi} style={{ gridTemplateColumns: '1fr auto' }}>
+            <input placeholder="Nombre del hotel" value={h.name} onChange={e => hset(hi, 'name', e.target.value)} />
+            <button className="btn del" onClick={() => change(n => n.hotels.splice(hi, 1))} aria-label="Quitar hotel">✕</button>
+            <div className="full times">
+              <div><label>Entrada</label><input type="date" value={h.date || ''} onChange={e => hset(hi, 'date', e.target.value)} /></div>
+              <div><label>Noches</label><input type="number" min="1" value={h.nights} onChange={e => hset(hi, 'nights', Math.max(1, parseInt(e.target.value) || 1))} /></div>
+            </div>
+            {h.date && <div className="full note">Salida: {fmtDate(addDays(h.date, h.nights))}</div>}
+            <input className="full" placeholder="Link de la reserva (opcional)" value={h.url || ''} onChange={e => hset(hi, 'url', e.target.value)}
+              onBlur={e => { const v = e.target.value.trim(); if (v && !/^https?:\/\//i.test(v)) hset(hi, 'url', 'https://' + v); }} />
+            <input className="full" type="tel" placeholder="Teléfono (opcional)" value={h.phone || ''} onChange={e => hset(hi, 'phone', e.target.value)} />
+          </div>
+        ))}
       </div>
       {t.days.map((d, di) => (
         <div className="panel" key={di}>
