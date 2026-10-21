@@ -34,6 +34,7 @@ export default function Cliente({ params }) {
               <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{hrs(it) ? ' · ' + hrs(it) : ''}</div>
               <h3>{it.title}</h3>{it.type === 'vuelo' && it.flight && <p>Vuelo {it.flight}</p>}{it.detail && <p>{it.detail}</p>}
               {/^https?:\/\//i.test(it.url || '') && <a className="pdf" href={it.url} target="_blank" rel="noopener noreferrer">🔗 Abrir reserva</a>}
+              {(it.phone || '').replace(/\D/g, '').length >= 5 && <a className="pdf" href={'tel:' + it.phone.replace(/[^\d+]/g, '')}>📞 {it.phone}</a>}
               {(it.files || []).map((f, k) => (f.ct || '').startsWith('image/')
                 ? <a key={k} href={f.url} target="_blank" rel="noopener"><img className="thumb" src={f.url} alt={f.name} /></a>
                 : <a key={k} className="pdf" href={f.url} target="_blank" rel="noopener">Ver {f.name}</a>)}

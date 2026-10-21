@@ -120,6 +120,8 @@ export default function Trip({ params }) {
               <input className="full" placeholder="Link del boleto o reserva (opcional)" value={it.url || ''}
                 onChange={e => change(n => { n.days[di].items[ii].url = e.target.value; })}
                 onBlur={e => { const v = e.target.value.trim(); if (v && !/^https?:\/\//i.test(v)) change(n => { n.days[di].items[ii].url = 'https://' + v; }); }} />
+              <input className="full" type="tel" placeholder="Teléfono (opcional)" value={it.phone || ''}
+                onChange={e => change(n => { n.days[di].items[ii].phone = e.target.value; })} />
               <div className="full">
                 {(it.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delFile(di, ii, fi)}>✕</button></span>))}
                 <div style={{ marginTop: 8 }}><label className="btn" style={{ display: 'inline-block', color: 'var(--ink)' }}>
