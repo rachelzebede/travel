@@ -43,6 +43,25 @@ export default function Cliente({ params }) {
     <main>
       <div className="hero"><h1>{t.title}</h1><p className="note">{t.dates}</p>
         <p className="by">Preparado para {t.client} por {t.agency}</p></div>
+      {(t.hotels || []).some(h => h.name) && (
+        <details className="day">
+          <summary>
+            <div className="dk">Alojamiento</div>
+            <h2>🏨 Hoteles</h2>
+          </summary>
+          <div className="dbody">
+            {(t.hotels || []).filter(h => h.name).map((h, i) => (
+              <div className="card" key={i}>
+                <div className="k">🏨 Hotel</div>
+                <h3>{h.name}</h3>
+                {h.date && <p>Entrada: {fmt(h.date)} · {h.nights} noche{h.nights > 1 ? 's' : ''} · Salida: {fmt(addDays(h.date, h.nights))}</p>}
+                {h.detail && <p>{h.detail}</p>}
+                <Extras url={h.url} phone={h.phone} email={h.email} files={h.files} />
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
       {t.days.map((d, i) => (
         <details className="day" key={i}>
           <summary>
@@ -66,8 +85,11 @@ export default function Cliente({ params }) {
               <Extras url={h.url} phone={h.phone} email={h.email} files={h.files} />
             </div>
           ))}
-          {d.date && hotels.filter(h => d.date > h.date && d.date < addDays(h.date, h.nights)).map((h, k) => (
-            <p className="note" style={{ margin: '4px 0 0' }} key={'n' + k}>🏨 Pasan la noche en {h.name}</p>
+          {d.date && hotels.filter(h => d.date === addDays(h.date, h.nights)).map((h, k) => (
+            <p className="note" style={{ margin: '8px 0 0' }} key={'o' + k}>🧳 Check-out de {h.name}</p>
+          ))}
+          {d.date && hotels.filter(h => d.date >= h.date && d.date < addDays(h.date, h.nights)).map((h, k) => (
+            <p className="note" style={{ margin: '8px 0 0' }} key={'n' + k}>🏨 Pasan la noche en {h.name}</p>
           ))}
           </div>
         </details>
