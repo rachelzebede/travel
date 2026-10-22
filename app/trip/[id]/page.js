@@ -125,6 +125,7 @@ export default function Trip({ params }) {
               onBlur={e => { const v = e.target.value.trim(); if (v && !/^https?:\/\//i.test(v)) hset(hi, 'url', 'https://' + v); }} />
             <input className="full" type="tel" placeholder="Teléfono (opcional)" value={h.phone || ''} onChange={e => hset(hi, 'phone', e.target.value)} />
             <input className="full" type="email" placeholder="Email (opcional)" value={h.email || ''} onChange={e => hset(hi, 'email', e.target.value)} />
+            <input className="full" placeholder="Dirección (opcional)" value={h.address || ''} onChange={e => hset(hi, 'address', e.target.value)} />
             <textarea className="full" rows={2} placeholder="Reserva: número de confirmación, notas…" value={h.detail || ''} onChange={e => hset(hi, 'detail', e.target.value)} />
             <div className="full">
               {(h.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delHotelFile(hi, fi)}>✕</button></span>))}
@@ -178,6 +179,8 @@ export default function Trip({ params }) {
                 onChange={e => change(n => { n.days[di].items[ii].phone = e.target.value; })} />
               <input className="full" type="email" placeholder="Email (opcional)" value={it.email || ''}
                 onChange={e => change(n => { n.days[di].items[ii].email = e.target.value; })} />
+              <input className="full" placeholder="Dirección (opcional)" value={it.address || ''}
+                onChange={e => change(n => { n.days[di].items[ii].address = e.target.value; })} />
               <div className="full">
                 {(it.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delFile(di, ii, fi)}>✕</button></span>))}
                 <div style={{ marginTop: 8 }}><label className="btn" style={{ display: 'inline-block', color: 'var(--ink)' }}>
