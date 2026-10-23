@@ -126,6 +126,18 @@ export default function Trip({ params }) {
             <input className="full" type="tel" placeholder="Teléfono (opcional)" value={h.phone || ''} onChange={e => hset(hi, 'phone', e.target.value)} />
             <input className="full" type="email" placeholder="Email (opcional)" value={h.email || ''} onChange={e => hset(hi, 'email', e.target.value)} />
             <input className="full" placeholder="Dirección (opcional)" value={h.address || ''} onChange={e => hset(hi, 'address', e.target.value)} />
+            <div className="full pay">
+              <div><label>Pago</label>
+                <select value={h.payStatus || ''} onChange={e => hset(hi, 'payStatus', e.target.value)}>
+                  <option value="">Sin indicar</option><option value="pagado">Pagado</option><option value="pendiente">Por pagar</option>
+                </select></div>
+              <div><label>Monto</label>
+                <input placeholder="Ej: $250" value={h.payAmount || ''} onChange={e => hset(hi, 'payAmount', e.target.value)} /></div>
+              <div><label>Método</label>
+                <select value={h.payMethod || ''} onChange={e => hset(hi, 'payMethod', e.target.value)}>
+                  <option value="">—</option><option value="tarjeta">Tarjeta</option><option value="efectivo">Efectivo</option>
+                </select></div>
+            </div>
             <textarea className="full" rows={2} placeholder="Reserva: número de confirmación, notas…" value={h.detail || ''} onChange={e => hset(hi, 'detail', e.target.value)} />
             <div className="full">
               {(h.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delHotelFile(hi, fi)}>✕</button></span>))}
@@ -181,6 +193,18 @@ export default function Trip({ params }) {
                 onChange={e => change(n => { n.days[di].items[ii].email = e.target.value; })} />
               <input className="full" placeholder="Dirección (opcional)" value={it.address || ''}
                 onChange={e => change(n => { n.days[di].items[ii].address = e.target.value; })} />
+              <div className="full pay">
+                <div><label>Pago</label>
+                  <select value={it.payStatus || ''} onChange={e => change(n => { n.days[di].items[ii].payStatus = e.target.value; })}>
+                    <option value="">Sin indicar</option><option value="pagado">Pagado</option><option value="pendiente">Por pagar</option>
+                  </select></div>
+                <div><label>Monto</label>
+                  <input placeholder="Ej: $250" value={it.payAmount || ''} onChange={e => change(n => { n.days[di].items[ii].payAmount = e.target.value; })} /></div>
+                <div><label>Método</label>
+                  <select value={it.payMethod || ''} onChange={e => change(n => { n.days[di].items[ii].payMethod = e.target.value; })}>
+                    <option value="">—</option><option value="tarjeta">Tarjeta</option><option value="efectivo">Efectivo</option>
+                  </select></div>
+              </div>
               <div className="full">
                 {(it.files || []).map((f, fi) => (<span className="chip" key={fi}>{f.name}<button onClick={() => delFile(di, ii, fi)}>✕</button></span>))}
                 <div style={{ marginTop: 8 }}><label className="btn" style={{ display: 'inline-block', color: 'var(--ink)' }}>

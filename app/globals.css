@@ -36,3 +36,8 @@ details.day[open]>summary::after{content:"–"}
 details.day h2{margin:0;font-size:22px}
 details.day .dk{margin-bottom:4px}
 .dbody{padding-top:12px}
+.pay{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.pago{display:inline-block;margin:8px 8px 0 0;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line)}
+.pago.ok{background:#E3EFDF;color:#2E5B2A;border-color:#C5DDBF}
+.pago.pend{background:#F6E7C8;color:#7A5A12;border-color:#E6D2A3}
+@media(prefers-color-scheme:dark){.pago.ok{background:#22372A;color:#9ED6A4;border-color:#2F4B38}.pago.pend{background:#3A3020;color:#E8C77A;border-color:#54442A}}

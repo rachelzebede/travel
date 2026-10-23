@@ -17,6 +17,16 @@ function fmt(s) {
   const d = new Date(s + 'T00:00:00');
   return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
 }
+function Pago({ o }) {
+  const st = o.payStatus, am = (o.payAmount || '').trim(), me = o.payMethod;
+  if (!st && !am && !me) return null;
+  const parts = [
+    st === 'pagado' ? '✅ Pagado' : st === 'pendiente' ? '⏳ Por pagar' : '',
+    am,
+    me === 'tarjeta' ? '💳 Tarjeta' : me === 'efectivo' ? '💵 Efectivo' : '',
+  ].filter(Boolean);
+  return <div className={'pago ' + (st === 'pagado' ? 'ok' : st === 'pendiente' ? 'pend' : '')}>{parts.join(' · ')}</div>;
+}
 function Extras({ url, phone, email, address, files }) {
   return (
     <>
@@ -62,7 +72,7 @@ export default function Cliente({ params }) {
                 <h3>{h.name}</h3>
                 {h.date && <p>Entrada: {fmt(h.date)} · {h.nights} noche{h.nights > 1 ? 's' : ''} · Salida: {fmt(addDays(h.date, h.nights))}</p>}
                 {h.detail && <p>{h.detail}</p>}
-                <Extras url={h.url} phone={h.phone} email={h.email} address={h.address} files={h.files} />
+                <Pago o={h} /><Extras url={h.url} phone={h.phone} email={h.email} address={h.address} files={h.files} />
               </div>
             ))}
           </div>
@@ -79,7 +89,7 @@ export default function Cliente({ params }) {
             <div className="card" key={j}>
               <div className="k">{(TIPOS[it.type] || TIPOS.nota)[0]} {(TIPOS[it.type] || TIPOS.nota)[1]}{hrs(it) ? ' · ' + hrs(it) : ''}</div>
               <h3>{it.title}</h3>{it.type === 'vuelo' && it.flight && <p>Vuelo {it.flight}</p>}{it.detail && <p>{it.detail}</p>}
-              <Extras url={it.url} phone={it.phone} email={it.email} address={it.address} files={it.files} />
+              <Pago o={it} /><Extras url={it.url} phone={it.phone} email={it.email} address={it.address} files={it.files} />
             </div>
           ))}
           {d.date && hotels.filter(h => h.date === d.date).map((h, k) => (
@@ -88,7 +98,7 @@ export default function Cliente({ params }) {
               <h3>{h.name}</h3>
               <p>{h.nights} noche{h.nights > 1 ? 's' : ''} · Salida: {fmt(addDays(h.date, h.nights))}</p>
               {h.detail && <p>{h.detail}</p>}
-              <Extras url={h.url} phone={h.phone} email={h.email} address={h.address} files={h.files} />
+              <Pago o={h} /><Extras url={h.url} phone={h.phone} email={h.email} address={h.address} files={h.files} />
             </div>
           ))}
           {d.date && hotels.filter(h => d.date === addDays(h.date, h.nights)).map((h, k) => (
