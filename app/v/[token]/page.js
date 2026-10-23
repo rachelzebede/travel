@@ -18,14 +18,16 @@ function fmt(s) {
   return isNaN(d) ? '' : d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 function Pago({ o }) {
-  const st = o.payStatus, am = (o.payAmount || '').trim(), me = o.payMethod;
-  if (!st && !am && !me) return null;
-  const parts = [
-    st === 'pagado' ? '✅ Pagado' : st === 'pendiente' ? '⏳ Por pagar' : '',
-    am,
-    me === 'tarjeta' ? '💳 Tarjeta' : me === 'efectivo' ? '💵 Efectivo' : '',
-  ].filter(Boolean);
-  return <div className={'pago ' + (st === 'pagado' ? 'ok' : st === 'pendiente' ? 'pend' : '')}>{parts.join(' · ')}</div>;
+  const st = o.payStatus, am = (o.payAmount || '').trim(), me = o.payMethod, nt = (o.payNote || '').trim();
+  if (!st && !am && !me && !nt) return null;
+  const MET = { tarjeta: '💳 Tarjeta', efectivo: '💵 Efectivo', cualquiera: '💳 Tarjeta o 💵 efectivo', transferencia: '🏦 Transferencia' };
+  const parts = [st === 'pagado' ? '✅ Pagado' : st === 'pendiente' ? '⏳ Por pagar' : '', am, MET[me] || ''].filter(Boolean);
+  return (
+    <>
+      {parts.length > 0 && <div className={'pago ' + (st === 'pagado' ? 'ok' : st === 'pendiente' ? 'pend' : '')}>{parts.join(' · ')}</div>}
+      {nt && <p className="note" style={{ margin: '6px 0 0' }}>ℹ️ {nt}</p>}
+    </>
+  );
 }
 function Extras({ url, phone, email, address, files }) {
   return (
