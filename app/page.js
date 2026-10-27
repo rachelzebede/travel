@@ -41,6 +41,7 @@ export default function Home() {
   if (!ready) return <main>Cargando…</main>;
   if (!logged) return (
     <main>
+      <img className="logo" src="/logo.png" alt="Logo" onError={e => { e.currentTarget.style.display = 'none'; }} />
       <h1 style={{ margin: '40px 0 16px' }}>Entrar</h1>
       <form className="panel" onSubmit={login}>
         <label>Correo</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -53,7 +54,7 @@ export default function Home() {
   return (
     <main>
       <div className="row" style={{ marginBottom: 16 }}>
-        <h1>Mis viajes</h1>
+        <div><img className="logo" src="/logo.png" alt="Logo" onError={e => { e.currentTarget.style.display = 'none'; }} /><h1>Mis viajes</h1></div>
         <div><button className="btn main" onClick={newTrip}>Nuevo viaje</button>{' '}
           <button className="btn" onClick={() => sb.auth.signOut().then(() => setLogged(false))}>Salir</button></div>
       </div>

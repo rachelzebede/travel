@@ -59,7 +59,7 @@ export default function Cliente({ params }) {
   const hotels = (t.hotels || []).filter(h => h.name && h.date);
   return (
     <main>
-      <div className="hero"><h1>{t.title}</h1><p className="note">{t.dates}</p>
+      <div className="hero"><img className="logo" src="/logo.png" alt="Logo" onError={e => { e.currentTarget.style.display = 'none'; }} /><h1>{t.title}</h1><p className="note">{t.dates}</p>
         <p className="by">Preparado para {t.client} por {t.agency}</p></div>
       {(t.hotels || []).some(h => h.name) && (
         <details className="day">
