@@ -41,5 +41,5 @@ details.day .dk{margin-bottom:4px}
 .pago.ok{background:#E3EFDF;color:#2E5B2A;border-color:#C5DDBF}
 .pago.pend{background:#F6E7C8;color:#7A5A12;border-color:#E6D2A3}
 @media(prefers-color-scheme:dark){.pago.ok{background:#22372A;color:#9ED6A4;border-color:#2F4B38}.pago.pend{background:#3A3020;color:#E8C77A;border-color:#54442A}}
-.logo{display:block;max-height:64px;max-width:220px;width:auto;height:auto;object-fit:contain;margin:0 0 16px}
-.hero .logo{margin-bottom:24px}
+.logo{display:block;max-height:90px;max-width:240px;width:auto;height:auto;object-fit:contain;margin:0 0 16px}
+.hero .logo{max-height:130px;max-width:300px;margin-bottom:24px}
